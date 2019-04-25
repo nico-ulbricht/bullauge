@@ -45,7 +45,7 @@ var Query = graphql.Field{
 	Args: graphql.FieldConfigArgument{
 		"app": &graphql.ArgumentConfig{
 			Description: "Prefix of the POD name",
-			Type:        graphql.NewNonNull(graphql.String),
+			Type:        graphql.String,
 		},
 		"namespace": &graphql.ArgumentConfig{
 			Description: "Namespace of the POD",
@@ -53,12 +53,12 @@ var Query = graphql.Field{
 		},
 	},
 	Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-		podList, _ := client.GetPods()
+		podList, _ := client.GetPods(p.Args["namespace"].(string))
 		pods := convertPodList(podList)
-		pods = filterPods(pods, &podFilterConfig{
-			App:       p.Args["app"].(string),
-			Namespace: p.Args["namespace"].(string),
-		})
+		if p.Args["app"] != nil {
+			pods = filterPods(pods, p.Args["app"].(string))
+		}
+
 		return pods, nil
 	},
 }
@@ -77,20 +77,11 @@ func convertPodList(podList *v1.PodList) []*pod {
 	return pods
 }
 
-type podFilterConfig struct {
-	App       string
-	Namespace string
-}
-
 //TODO: pass filter to k8s client instead of inmem filtering
-func filterPods(pods []*pod, filterConfig *podFilterConfig) []*pod {
+func filterPods(pods []*pod, filterPrefix string) []*pod {
 	filteredPods := []*pod{}
 	for _, pod := range pods {
-		if strings.HasPrefix(pod.Name, filterConfig.App) == false {
-			continue
-		}
-
-		if filterConfig.Namespace != "" && strings.ToLower(pod.Namespace) == strings.ToLower(filterConfig.Namespace) == false {
+		if strings.HasPrefix(pod.Name, filterPrefix) == false {
 			continue
 		}
 
