@@ -7,7 +7,6 @@ import (
 	v1 "k8s.io/api/core/v1"
 
 	"github.com/graphql-go/graphql"
-	"github.com/nico-ulbricht/bullauge/pkg/client"
 )
 
 type pod struct {
@@ -53,7 +52,7 @@ var Query = graphql.Field{
 		},
 	},
 	Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-		podList, _ := client.GetPods(p.Args["namespace"].(string))
+		podList, _ := GetPods(p.Args["namespace"].(string))
 		pods := convertPodList(podList)
 		if p.Args["app"] != nil {
 			pods = filterPods(pods, p.Args["app"].(string))
