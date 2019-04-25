@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	v1 "k8s.io/api/core/v1"
-
 	"github.com/graphql-go/graphql"
+	v1 "k8s.io/api/core/v1"
 )
 
 type pod struct {
@@ -22,6 +21,13 @@ var podType = graphql.NewObject(graphql.ObjectConfig{
 		"image": &graphql.Field{
 			Description: "Image that is being used by the POD",
 			Type:        graphql.String,
+		},
+		"logs": &graphql.Field{
+			Description: "Logs of the POD",
+			Type:        graphql.String,
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				return "logs", nil
+			},
 		},
 		"name": &graphql.Field{
 			Description: "Name of the POD",

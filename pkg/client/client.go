@@ -15,7 +15,7 @@ import (
 
 var k8s *kubernetes.Clientset
 
-func getClient() *kubernetes.Clientset {
+func GetClient() *kubernetes.Clientset {
 	if k8s != nil {
 		return k8s
 	}
