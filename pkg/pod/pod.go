@@ -21,29 +21,34 @@ var podType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "POD",
 	Fields: graphql.Fields{
 		"image": &graphql.Field{
-			Type: graphql.String,
+			Description: "Image that is being used by the POD",
+			Type:        graphql.String,
 		},
 		"name": &graphql.Field{
-			Type: graphql.String,
+			Description: "Name of the POD",
+			Type:        graphql.String,
 		},
 		"namespace": &graphql.Field{
-			Type: graphql.String,
+			Description: "Namespace the POD is running in",
+			Type:        graphql.String,
 		},
 		"status": &graphql.Field{
-			Type: graphql.String,
+			Description: "Current status of the POD",
+			Type:        graphql.String,
 		},
 	},
 })
 
 var Query = graphql.Field{
-	Type: graphql.NewNonNull(graphql.NewList(graphql.NewNonNull(podType))),
+	Type:        graphql.NewNonNull(graphql.NewList(graphql.NewNonNull(podType))),
+	Description: "List of PODs on the Cluster",
 	Args: graphql.FieldConfigArgument{
 		"app": &graphql.ArgumentConfig{
-			Description: "Name of the application",
+			Description: "Prefix of the POD name",
 			Type:        graphql.NewNonNull(graphql.String),
 		},
 		"namespace": &graphql.ArgumentConfig{
-			Description: "Namespace of the application",
+			Description: "Namespace of the POD",
 			Type:        graphql.NewNonNull(graphql.String),
 		},
 	},
