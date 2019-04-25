@@ -1,4 +1,5 @@
 {{- if .Values.ingress.enabled -}}
+{{- $servicePort := .Values.service.externalPort -}}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -10,7 +11,7 @@ metadata:
     heritage: "{{ .Release.Service }}"
   annotations:
     {{- range $key, $value := .Values.ingress.annotations }}
-      {{ $key }}: {{ $value | quote }}
+    {{ $key }}: {{ $value | quote }}
     {{- end }}
 spec:
   rules:
@@ -20,7 +21,7 @@ spec:
         paths:
           - path: /
             backend:
-              serviceName: {{ template "fullName" . }}
-              servicePort: {{ .Values.service.externalPort }}
+              serviceName: "bullauge-server"
+              servicePort: {{ $servicePort }}
     {{- end -}}
 {{- end -}}
