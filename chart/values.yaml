@@ -1,0 +1,19 @@
+image: nicoulbricht/bullauge:latest
+replicaCount: 1
+
+env:
+  K8S_CONNECTION_METHOD: "local"
+  PORT: "80"
+
+ingress:
+  enabled: false
+
+resources:
+  requests:
+    memory: 128Mi
+    cpu: 0.01m
+
+service:
+  externalPort: 80
+  internalPort: 80
+  type: ClusterIP
