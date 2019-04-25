@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/graphql-go/graphql"
+	"github.com/nico-ulbricht/bullauge/pkg/logs"
 	v1 "k8s.io/api/core/v1"
 )
 
@@ -25,8 +26,18 @@ var podType = graphql.NewObject(graphql.ObjectConfig{
 		"logs": &graphql.Field{
 			Description: "Logs of the POD",
 			Type:        graphql.String,
+			Args: graphql.FieldConfigArgument{
+				"limit": &graphql.ArgumentConfig{
+					DefaultValue: 10,
+					Description:  "Maximum number of logs to return",
+					Type:         graphql.Int,
+				},
+			},
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				return "logs", nil
+				pod := p.Source.(*pod)
+				lineLimit := p.Args["limit"].(int)
+				logs := logs.GetLogs(pod.Name, pod.Namespace, lineLimit)
+				return logs, nil
 			},
 		},
 		"name": &graphql.Field{

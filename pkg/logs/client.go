@@ -1,4 +1,4 @@
-package client
+package logs
 
 import (
 	"bufio"
@@ -10,10 +10,14 @@ import (
 	"k8s.io/api/core/v1"
 )
 
-func GetLogs(name, namespace string) string {
+func GetLogs(name, namespace string, limit int) string {
 	k8s := client.GetClient()
 
-	request := k8s.CoreV1().Pods(namespace).GetLogs(name, &v1.PodLogOptions{})
+	limit64 := int64(limit)
+	request := k8s.CoreV1().Pods(namespace).GetLogs(name, &v1.PodLogOptions{
+		TailLines: &limit64,
+	})
+
 	readCloser, err := request.Stream()
 	if err != nil {
 		log.Fatalf("Error requesting logs. Error: %v", err)
