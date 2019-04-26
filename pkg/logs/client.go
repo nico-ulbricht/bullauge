@@ -5,12 +5,13 @@ import (
 	"bytes"
 	"io"
 	"log"
+	"strings"
 
 	"github.com/nico-ulbricht/bullauge/pkg/client"
 	"k8s.io/api/core/v1"
 )
 
-func GetLogs(name, namespace string, limit int) string {
+func GetLogs(name, namespace string, limit int) []string {
 	k8s := client.GetClient()
 
 	limit64 := int64(limit)
@@ -28,5 +29,19 @@ func GetLogs(name, namespace string, limit int) string {
 	writer := bufio.NewWriter(&b)
 	_, err = io.Copy(writer, readCloser)
 
-	return b.String()
+	logs := filterEmpty(strings.Split(b.String(), "\n"))
+	return logs
+}
+
+func filterEmpty(logs []string) []string {
+	filteredLogs := make([]string, 0)
+	for _, log := range logs {
+		if log == "" {
+			continue
+		}
+
+		filteredLogs = append(filteredLogs, log)
+	}
+
+	return filteredLogs
 }

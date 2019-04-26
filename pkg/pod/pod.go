@@ -25,7 +25,7 @@ var podType = graphql.NewObject(graphql.ObjectConfig{
 		},
 		"logs": &graphql.Field{
 			Description: "Logs of the POD",
-			Type:        graphql.String,
+			Type:        graphql.NewNonNull(graphql.NewList(graphql.NewNonNull(graphql.String))),
 			Args: graphql.FieldConfigArgument{
 				"limit": &graphql.ArgumentConfig{
 					DefaultValue: 10,
@@ -35,6 +35,10 @@ var podType = graphql.NewObject(graphql.ObjectConfig{
 			},
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				pod := p.Source.(*pod)
+				if pod.Status == "containercreating" || pod.Status == "pending" {
+					return []string{}, nil
+				}
+
 				lineLimit := p.Args["limit"].(int)
 				logs := logs.GetLogs(pod.Name, pod.Namespace, lineLimit)
 				return logs, nil
