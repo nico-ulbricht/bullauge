@@ -15,6 +15,11 @@ spec:
       - name: {{ .Chart.Name }}
         image: "{{ .Values.image }}"
         imagePullPolicy: IfNotPresent
+        readinessProbe:
+          periodSeconds: 10
+          httpGet:
+            path: /healthz
+            port: {{ .Values.service.internalPort | int }}
         envFrom:
         - configMapRef:
             name: {{ .Chart.Name }}

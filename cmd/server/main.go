@@ -35,8 +35,13 @@ func main() {
 		Playground: true,
 	})
 
+	http.HandleFunc("/healthz", healthHandler)
 	http.Handle("/graphql", gqlHandler)
 	port := fmt.Sprintf(":%s", os.Getenv("PORT"))
 	log.Printf("Listening on port %s.", port)
 	http.ListenAndServe(port, nil)
+}
+
+func healthHandler(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("Pong"))
 }

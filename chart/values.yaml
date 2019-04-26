@@ -1,4 +1,4 @@
-image: nicoulbricht/bullauge:latest
+image: nicoulbricht/bullauge:0.3.1
 replicaCount: 1
 
 env:
