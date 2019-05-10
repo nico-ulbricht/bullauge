@@ -10,6 +10,7 @@ import (
 )
 
 type pod struct {
+	CreatedAt string `json:"createdAt"`
 	Image     string `json:"image"`
 	Name      string `json:"name"`
 	Namespace string `json:"namespace"`
@@ -19,6 +20,10 @@ type pod struct {
 var podType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "POD",
 	Fields: graphql.Fields{
+		"createdAt": &graphql.Field{
+			Description: "Creation Timestamp of the POD",
+			Type:        graphql.String,
+		},
 		"image": &graphql.Field{
 			Description: "Image that is being used by the POD",
 			Type:        graphql.String,
@@ -63,13 +68,13 @@ var Query = graphql.Field{
 	Type:        graphql.NewNonNull(graphql.NewList(graphql.NewNonNull(podType))),
 	Description: "List of PODs on the Cluster",
 	Args: graphql.FieldConfigArgument{
-		"app": &graphql.ArgumentConfig{
-			Description: "Prefix of the POD name",
-			Type:        graphql.String,
-		},
 		"namespace": &graphql.ArgumentConfig{
 			Description: "Namespace of the POD",
 			Type:        graphql.NewNonNull(graphql.String),
+		},
+		"prefix": &graphql.ArgumentConfig{
+			Description: "Prefix of the POD name",
+			Type:        graphql.String,
 		},
 	},
 	Resolve: func(p graphql.ResolveParams) (interface{}, error) {
@@ -87,6 +92,7 @@ func convertPodList(podList *v1.PodList) []*pod {
 	pods := make([]*pod, len(podList.Items))
 	for idx, podItem := range podList.Items {
 		pods[idx] = &pod{
+			CreatedAt: podItem.CreationTimestamp.String(),
 			Image:     podItem.Spec.Containers[0].Image,
 			Name:      podItem.GetName(),
 			Namespace: podItem.GetNamespace(),
