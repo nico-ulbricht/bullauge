@@ -40,7 +40,7 @@ var podType = graphql.NewObject(graphql.ObjectConfig{
 				}
 
 				lineLimit := p.Args["limit"].(int)
-				logs := logs.GetLogs(pod.Name, pod.Namespace, lineLimit)
+				logs, _ := logs.GetLogs(pod.Name, pod.Namespace, lineLimit)
 				return logs, nil
 			},
 		},

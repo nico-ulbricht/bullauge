@@ -4,14 +4,13 @@ import (
 	"bufio"
 	"bytes"
 	"io"
-	"log"
 	"strings"
 
 	"github.com/nico-ulbricht/bullauge/pkg/client"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 )
 
-func GetLogs(name, namespace string, limit int) []string {
+func GetLogs(name, namespace string, limit int) ([]string, error) {
 	k8s := client.GetClient()
 
 	limit64 := int64(limit)
@@ -21,7 +20,7 @@ func GetLogs(name, namespace string, limit int) []string {
 
 	readCloser, err := request.Stream()
 	if err != nil {
-		log.Fatalf("Error requesting logs. Error: %v", err)
+		return []string{}, err
 	}
 
 	defer readCloser.Close()
@@ -30,7 +29,7 @@ func GetLogs(name, namespace string, limit int) []string {
 	_, err = io.Copy(writer, readCloser)
 
 	logs := filterEmpty(strings.Split(b.String(), "\n"))
-	return logs
+	return logs, nil
 }
 
 func filterEmpty(logs []string) []string {
