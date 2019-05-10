@@ -9,6 +9,7 @@ import (
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/handler"
 	"github.com/joho/godotenv"
+	"github.com/nico-ulbricht/bullauge/pkg/auth"
 	"github.com/nico-ulbricht/bullauge/pkg/pod"
 )
 
@@ -36,10 +37,11 @@ func main() {
 	})
 
 	http.HandleFunc("/healthz", healthHandler)
-	http.Handle("/graphql", gqlHandler)
+	http.Handle("/graphql", auth.Mount(gqlHandler))
+
 	port := fmt.Sprintf(":%s", os.Getenv("PORT"))
 	log.Printf("Listening on port %s.", port)
-	http.ListenAndServe(port, nil)
+	panic(http.ListenAndServe(port, nil))
 }
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {
